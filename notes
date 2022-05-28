@@ -1,0 +1,7 @@
+https://stackabuse.com/self-organizing-maps-theory-and-implementation-in-python-with-numpy/
+# RI is better for non linear conditions
+"
+By comparing the proportion of final SOM map of RI (Random Initialization) which outperformed PCI (Principal Component Initialization) under the same conditions, it was observed that RI performed quite well for non-linear data sets.
+
+However for quasi-linear datasets, the result remains inconclusive. In general, we 
+"
