@@ -12,7 +12,7 @@ class SOM():
     def __init__(self, input, verbose):
         # SOM variables
         """ Training epochs"""
-        self.epochs = 50
+        self.epochs = 15
         """ X Coordinate of the BMU"""
         self.xBMU = 0
         """ Y Coordinate of the BMU"""
@@ -39,7 +39,7 @@ class SOM():
 
         if input is not None:
             self.trainingData = self.parseImageDataset(input)
-            self.SOM = sampleListRandomly(self.trainingData)
+            self.SOM = sampleListRandomly(self.trainingData, 20)
         else:
             self.trainingData = getRandomTrainData(1000)
             self.SOM = getRandomGrid(self.mapSize)
@@ -49,10 +49,12 @@ class SOM():
         original = self.SOM.copy()
         newSom = self.trainSOM(self.SOM, self.trainingData)
         
+        
+        visualizeGrid(gallery(newSom))
         if self.verbose is True:
-            visTwoImages(original, newSom)
-            plotXY(self.learningRates)
-            plotXY(self.radiuses)
+            pass
+            #plotXY(self.learningRates)
+            #plotXY(self.radiuses)
         
 
     def parseImageDataset(self, input):
@@ -69,10 +71,24 @@ class SOM():
 
 
     def findBmu(self, SOM, x):
-        # Subtract HOG features from each element of the SOM and save it to distSq
-        distSq = np.square(SOM - x)
+        
+        # compare euclidean distance of each element of the SOM to the input
+        # and save the index of the closest element to bmu
+        distances = np.zeros((SOM.shape[0], SOM.shape[1]), dtype=np.float32)
+        for width in range(len(SOM)):
+            for length in range(len(SOM)):
+                element = SOM[width][length].features
+                # Get euclidean distance from two float arrays element and x.features
+                d = np.linalg.norm(element - x.features)
+                # Insert the euclidean distance into the distances array
+                distances[width][length] = d
+                
 
-        return np.unravel_index(np.argmin(distSq, axis=None), distSq.shape)
+        # Get the index of the minimum distance
+        min_index = np.unravel_index(np.argmin(distances, axis=None), distances.shape)
+        # return the coordinates of the minimum distance
+        return min_index
+        
 
 
     def getUpdatedLearnRate(self, learningRate, epoch):
@@ -85,21 +101,21 @@ class SOM():
         return radius * np.exp(epoch * -self.beta)
 
 
-    def updateWeights(self, SOM, trainingExample, learningRate, radius, bmuCoord, step=3):
+    def updateWeights(self, SOM, trainingExample, learningRate, radius, bmuCoord, step=2):
         g, h = bmuCoord
-        if radius < 1e-3:
-            SOM[g, h, :] += learningRate * (trainingExample - SOM[g, h, :])
-            return SOM
         
         # Change cells in a neighbourhood of BMU
         for i in range(max(0, g - step), min(SOM.shape[0], g + step)):
             for j in range(max(0, h - step), min(SOM.shape[1], h + step)):
-                distSq = np.square(i - g) + np.square(j - h)
-                distFunc = np.exp(-distSq / 2 / radius)
-                toAdd = learningRate * distFunc * (trainingExample - SOM[i, j])
-                SOM[i, j] += toAdd
-        
-        return SOM
+                # distSq = np.square((i - g) ** 2) + np.square((j - h) ** 2)
+                # distFunc = np.exp(-distSq / 2 / radius)
+
+
+                # img = learningRate * distFunc * (trainingExample.data - SOM[i, j].data)
+                # features = computeHogFeatures(img)
+                # toAdd = Image(img, features)
+                SOM[i, j] = trainingExample
+                return SOM
 
 
     def trainSOM(self, SOM, trainingData):

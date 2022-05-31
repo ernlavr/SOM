@@ -114,7 +114,7 @@ def sampleListRandomly(input : np.ndarray, n=10):
 
 def computeHogFeatures(image : np.ndarray):
     hog = cv2.HOGDescriptor()
-    return hog.compute(image)
+    return hog.compute(image.astype(np.uint8))
 
 
 def getEuclideanDistance(img1 : np.ndarray, img2 : np.ndarray):

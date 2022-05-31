@@ -23,7 +23,7 @@ def main():
     # img = cv2.imread(args.input)
     # img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     args = getCmdLineArgs()
-    inputData = loadImagesFrom(args.input, everyNth=20)
+    inputData = loadImagesFrom(args.input, everyNth=5)
     verbose = args.verbose
     map = som.SOM(inputData, verbose)
     
