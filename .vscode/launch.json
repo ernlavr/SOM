@@ -19,7 +19,7 @@
             "request": "launch",
             "program": "main.py",
             "console": "integratedTerminal",
-            "args": ["-v", "-i", "data/afhq/val/cat/"],
+            "args": ["-v", "-i", "data/afhq/val/"],
             "justMyCode": true
         }
     ]
